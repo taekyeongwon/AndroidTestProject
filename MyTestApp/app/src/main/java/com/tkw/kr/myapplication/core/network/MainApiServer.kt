@@ -9,6 +9,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import java.lang.AssertionError
 import java.lang.ClassCastException
@@ -34,8 +35,9 @@ object MainApiServer: BaseNetwork<Retrofit>() { //Retrofit 라이브러리 객�
         }.build()
 
         return Retrofit.Builder()
-            .baseUrl("")
+            .baseUrl("http://api.github.com")   //github api test
             .client(client)
+//            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
@@ -69,7 +71,16 @@ object MainApiServer: BaseNetwork<Retrofit>() { //Retrofit 라이브러리 객�
     override fun <V : ServerResult> parsingResponse(call: Call<V>, callback: NetResultCallback<V>) {    //코루틴 사용 없이 콜백 사용하는 경우 호출
         call.enqueue(object : Callback<V> {
             override fun onResponse(call: Call<V>, response: Response<V>) {
-
+                if(response.isSuccessful) {
+                    val base = response.body()
+                    if(base is ServerResult && !base.isSuccess()) { //200ok이면서 서버 커스텀 에러 처리
+                        callback.onResponse(NetResult.error(AppError.Server(base)))
+                    } else {
+                        callback.onResponse(NetResult.success(response.body()))
+                    }
+                } else {
+                    callback.onResponse(NetResult.error(AppError.Network(response.code()))) //200 외(300~500) 에러
+                }
             }
 
             override fun onFailure(call: Call<V>, t: Throwable) {
