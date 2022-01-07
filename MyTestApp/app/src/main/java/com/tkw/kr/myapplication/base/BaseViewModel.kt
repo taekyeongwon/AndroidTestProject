@@ -4,6 +4,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import com.tkw.kr.myapplication.core.network.error.AppError
 import com.tkw.kr.myapplication.util.SingleLiveEvent
+import io.reactivex.Scheduler
+import io.reactivex.SingleTransformer
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 
@@ -29,10 +35,27 @@ abstract class BaseViewModel: ViewModel() {
     val progressFlag: LiveData<Boolean> get() = _progressFlag
     val alertFlag: LiveData<AppError.Base> get() = _alertFlag
 
+    private val compositeDisposable = CompositeDisposable() //subscribe()로 리턴된 Disposable객체를 라이프사이클에 맞춰 한번에 해제시켜주기 위한 객체(메모리 누수 방지)
+
     protected val coroutineExceptionHandler = CoroutineExceptionHandler { coroutineContext, throwable ->
         throwable.printStackTrace()
     }
 
     protected val ioDispatchers = Dispatchers.IO + coroutineExceptionHandler
     protected val uiDispatchers = Dispatchers.Main + coroutineExceptionHandler
+
+    fun <T> chainingSchedulers(): SingleTransformer<T, T> {
+        return SingleTransformer {
+            it.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+        }
+    }
+
+    fun addDisposable(disposable: Disposable) {
+        compositeDisposable.add(disposable)
+    }
+
+    override fun onCleared() {
+        compositeDisposable.clear()
+        super.onCleared()
+    }
 }

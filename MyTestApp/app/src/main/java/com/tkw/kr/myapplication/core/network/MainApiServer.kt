@@ -3,6 +3,8 @@ package com.tkw.kr.myapplication.core.network
 import androidx.multidex.BuildConfig
 import com.tkw.kr.myapplication.core.network.base.*
 import com.tkw.kr.myapplication.core.network.error.AppError
+import io.reactivex.Single
+import io.reactivex.subjects.SingleSubject
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Call
@@ -37,7 +39,7 @@ object MainApiServer: BaseNetwork<Retrofit>() { //Retrofit 라이브러리 객�
         return Retrofit.Builder()
             .baseUrl("http://api.github.com")   //github api test
             .client(client)
-//            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
@@ -91,4 +93,27 @@ object MainApiServer: BaseNetwork<Retrofit>() { //Retrofit 라이브러리 객�
     }
 
 
+    override fun <V : ServerResult> Call<V>.toSingle(): Single<V> { //rx single 객체를 통해 통신하는 경우 호출
+        val single = SingleSubject.create<V>()
+        this.enqueue(object : Callback<V> {
+            override fun onResponse(call: Call<V>, response: Response<V>) {
+                if(response.isSuccessful) {
+                    val base = response.body()
+                    if(base is ServerResult && !base.isSuccess()) {
+                        single.onError(AppError.Server(base))
+                    } else {
+                        single.onSuccess(base!!)
+                    }
+                } else {
+                    single.onError(AppError.Network(response.code()))
+                }
+            }
+
+            override fun onFailure(call: Call<V>, t: Throwable) {
+                single.onError(AppError.Network(-1, t))
+            }
+        })
+
+        return single
+    }
 }
