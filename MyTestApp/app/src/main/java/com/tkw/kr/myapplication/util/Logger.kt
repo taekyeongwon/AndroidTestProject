@@ -14,7 +14,7 @@ import java.util.*
 
 object Logger {
 
-    val TAG = MainApplication.application.packageName ?: "MyApp"
+    val TAG = MainApplication.application?.packageName ?: "MyApp"
     val FILE_LOGGING = false
 
     /**

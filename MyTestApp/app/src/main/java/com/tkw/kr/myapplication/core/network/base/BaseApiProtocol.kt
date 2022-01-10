@@ -1,6 +1,6 @@
 package com.tkw.kr.myapplication.core.network.base
 
-import com.tkw.kr.myapplication.component.main.GithubRepos
+import com.tkw.kr.myapplication.component.github.GithubRepos
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.Query

@@ -1,4 +1,4 @@
-package com.tkw.kr.myapplication.component.main
+package com.tkw.kr.myapplication.component.github
 
 import com.tkw.kr.myapplication.core.network.base.BaseResponse
 

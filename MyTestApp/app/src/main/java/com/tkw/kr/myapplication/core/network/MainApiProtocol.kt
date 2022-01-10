@@ -1,6 +1,6 @@
 package com.tkw.kr.myapplication.core.network
 
-import com.tkw.kr.myapplication.component.main.GithubRepos
+import com.tkw.kr.myapplication.component.github.GithubRepos
 import com.tkw.kr.myapplication.core.network.base.BaseApiProtocol
 import retrofit2.Call
 import retrofit2.Response

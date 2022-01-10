@@ -1,12 +1,17 @@
 package com.tkw.kr.myapplication.component.main
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.tkw.kr.myapplication.R
 import com.tkw.kr.myapplication.base.BaseView
+import com.tkw.kr.myapplication.component.github.GithubActivity
+import com.tkw.kr.myapplication.component.map.GoogleMapActivity
 import com.tkw.kr.myapplication.core.factory.MyProviderFactory
+import com.tkw.kr.myapplication.util.setOnSingleClickListener
+import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : BaseView<MainViewModel>() {
     override val layoutResourceId: Int
@@ -18,14 +23,18 @@ class MainActivity : BaseView<MainViewModel>() {
     }
 
     override fun initObserver() {
-        viewModel.githubRepoData.observe(this, Observer {
-            if(it.items != null) {
 
-            }
-        })
     }
 
     override fun initListener() {
-        
+        btn_github.setOnSingleClickListener {
+            val githubIntent = Intent(this@MainActivity, GithubActivity::class.java)
+            startActivity(githubIntent)
+        }
+
+        btn_googlemap.setOnSingleClickListener {
+            val googlemapIntent = Intent(this@MainActivity, GoogleMapActivity::class.java)
+            startActivity(googlemapIntent)
+        }
     }
 }

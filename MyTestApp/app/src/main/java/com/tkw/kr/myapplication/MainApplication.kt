@@ -7,19 +7,28 @@ import com.tkw.kr.myapplication.core.helper.LocaleHelper
 import com.tkw.kr.myapplication.util.Logger
 import java.io.PrintWriter
 import java.io.StringWriter
+import java.lang.ref.WeakReference
 
 class MainApplication: MultiDexApplication() {
     companion object {
-        lateinit var application: MainApplication
+        private var _application: WeakReference<MainApplication>? = null
+
+        val application: MainApplication?
+            get() {
+                if (_application != null) {
+                    return _application!!.get()
+                }
+                return null
+            }
 
         fun getString(stringResId: Int): String {
-            return application.getString(stringResId) ?: ""
+            return application?.getString(stringResId) ?: ""
         }
     }
 
     override fun onCreate() {
         super.onCreate()
-        application = this
+        _application = WeakReference(this)
         setUncaughtExceptionHandler()
     }
 
