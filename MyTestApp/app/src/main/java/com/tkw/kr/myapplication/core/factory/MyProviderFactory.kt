@@ -6,14 +6,14 @@ import com.tkw.kr.myapplication.component.github.GithubModelImpl
 import com.tkw.kr.myapplication.component.github.GithubViewModel
 import com.tkw.kr.myapplication.component.main.MainModelImpl
 import com.tkw.kr.myapplication.component.main.MainViewModel
-import com.tkw.kr.myapplication.component.map.GoogleMapViewModel
+import com.tkw.kr.myapplication.component.map.MapViewModel
 
 class MyProviderFactory: ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         return when(modelClass) {
             MainViewModel::class.java -> MainViewModel(MainModelImpl()) as T
             GithubViewModel::class.java -> GithubViewModel(GithubModelImpl()) as T
-            GoogleMapViewModel::class.java -> GoogleMapViewModel() as T
+            MapViewModel::class.java -> MapViewModel() as T
             else -> throw IllegalArgumentException("Unknown Class")
         }
     }

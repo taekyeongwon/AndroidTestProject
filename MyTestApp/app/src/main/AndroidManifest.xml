@@ -23,14 +23,18 @@
         </activity>
 
         <activity android:name=".component.map.GoogleMapActivity"
-            android:exported="true"/>
+            android:exported="false"/>
 
         <activity android:name=".component.github.GithubActivity"
-            android:exported="true"/>
+            android:exported="false"/>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="${MAPS_API_KEY}"/>
+            android:value="${GOOGLE_MAPS_API_KEY}"/>
+
+        <meta-data
+            android:name="com.naver.maps.map.CLIENT_ID"
+            android:value="${NAVER_MAPS_CLIENT_ID}"/>
     </application>
 
 </manifest>

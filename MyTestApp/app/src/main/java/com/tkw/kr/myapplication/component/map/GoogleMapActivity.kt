@@ -7,15 +7,15 @@ import com.tkw.kr.myapplication.R
 import com.tkw.kr.myapplication.base.BaseView
 import com.tkw.kr.myapplication.core.factory.MyProviderFactory
 
-class GoogleMapActivity: BaseView<GoogleMapViewModel>(), OnMapReadyCallback {
+class GoogleMapActivity: BaseView<MapViewModel>(), OnMapReadyCallback {
     override val layoutResourceId: Int
         get() = R.layout.activity_googlemap
-    override lateinit var viewModel: GoogleMapViewModel
+    override lateinit var viewModel: MapViewModel
 
     private lateinit var mMap: GoogleMap
 
     override fun initView() {
-        viewModel = ViewModelProvider(this, MyProviderFactory()).get(GoogleMapViewModel::class.java)
+        viewModel = ViewModelProvider(this, MyProviderFactory()).get(MapViewModel::class.java)
         val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
     }

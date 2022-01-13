@@ -1,9 +1,6 @@
 package com.tkw.kr.myapplication.component.main
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.tkw.kr.myapplication.R
 import com.tkw.kr.myapplication.base.BaseView
