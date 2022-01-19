@@ -20,7 +20,9 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
 //        buildConfigField "String", "MAPS_API_KEY", properties['MAPS_API_KEY']
-        manifestPlaceholders = [GOOGLE_MAPS_API_KEY:properties['GOOGLE_MAPS_API_KEY'], NAVER_MAPS_CLIENT_ID:properties['NAVER_MAPS_CLIENT_ID']]
+        manifestPlaceholders = [GOOGLE_MAPS_APP_KEY:properties['GOOGLE_MAPS_APP_KEY'],
+                                NAVER_MAPS_APP_KEY:properties['NAVER_MAPS_APP_KEY'],
+                                KAKAO_MAPS_APP_KEY:properties['KAKAO_MAPS_APP_KEY']]
     }
 
     buildTypes {
@@ -39,7 +41,7 @@ android {
 }
 
 dependencies {
-
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'androidx.core:core-ktx:1.7.0'
     implementation 'androidx.appcompat:appcompat:1.4.0'
