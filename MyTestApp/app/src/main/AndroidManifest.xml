@@ -29,6 +29,9 @@
         <activity android:name=".component.github.GithubActivity"
             android:exported="false"/>
 
+        <activity android:name=".component.covid.CovidActivity"
+            android:exported="false"/>
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="${GOOGLE_MAPS_APP_KEY}"/>

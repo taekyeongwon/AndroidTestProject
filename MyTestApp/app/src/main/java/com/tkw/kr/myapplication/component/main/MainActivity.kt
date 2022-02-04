@@ -8,6 +8,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModelProvider
 import com.tkw.kr.myapplication.R
 import com.tkw.kr.myapplication.base.BaseView
+import com.tkw.kr.myapplication.component.covid.CovidActivity
 import com.tkw.kr.myapplication.component.github.GithubActivity
 import com.tkw.kr.myapplication.component.map.GoogleMapActivity
 import com.tkw.kr.myapplication.core.factory.MyProviderFactory
@@ -38,6 +39,11 @@ class MainActivity : BaseView<MainViewModel>() {
         btn_googlemap.setOnSingleClickListener {
             val googlemapIntent = Intent(this@MainActivity, GoogleMapActivity::class.java)
             startActivity(googlemapIntent)
+        }
+
+        btn_covid.setOnSingleClickListener {
+            val covidIntent = Intent(this@MainActivity, CovidActivity::class.java)
+            startActivity(covidIntent)
         }
     }
 
