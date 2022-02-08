@@ -1,75 +1,51 @@
 package com.tkw.kr.myapplication.component.covid
 
-import android.os.Handler
 import android.util.Log
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.google.gson.Gson
 import com.tkw.kr.myapplication.R
 import com.tkw.kr.myapplication.base.BaseView
-import com.tkw.kr.myapplication.base.BaseViewModel
 import com.tkw.kr.myapplication.core.factory.MyProviderFactory
-import org.json.JSONObject
-import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
-import java.io.IOException
-import java.text.SimpleDateFormat
-import java.util.*
+import com.tkw.kr.myapplication.util.setOnSingleClickListener
+import kotlinx.android.synthetic.main.activity_covid.*
 
 class CovidActivity: BaseView<CovidViewModel>() {
     override val layoutResourceId: Int
         get() = R.layout.activity_covid
     override lateinit var viewModel: CovidViewModel
 
-    private var disasterSmsUrl: String = "https://www.safekorea.go.kr/idsiSFK/sfk/cs/sua/web/DisasterSmsList.do"
-    private lateinit var disasterDocument: Document
-
     override fun initView() {
         viewModel = ViewModelProvider(this, MyProviderFactory()).get(CovidViewModel::class.java)
-        getData()
 
+        viewModel.getTotalCount()
     }
 
     override fun initObserver() {
+        viewModel.totalCount.observe(this, androidx.lifecycle.Observer {
+            Log.d("disaster", "totalCount : " + it)
+            if(it == 0) {
+                return@Observer
+            }
+            if(viewModel.getSavedList() != null && viewModel.getSavedList()?.disasterSmsList?.size != 0) {
+                //저장된 데이터가 있으면 이전 토탈 개수와 비교하여 차이만큼 조회해서 신규 데이터만 추가
+                Log.d("totalCount", "getRecentData(${it - viewModel.getLastTotalCount()})")
+                viewModel.getRecentData(it - viewModel.getLastTotalCount())
+            } else {
+                //저장된 데이터가 없으면(최초, 데이터 삭제 시) 전체 조회
+                Log.d("totalCount", "getTotalData(${it})")
+                viewModel.getTotalData(it)
+            }
+        })
 
+        viewModel.accCount.observe(this, Observer {
+            Log.d("disaster", "accCount : " + it)
+            tv_acc_count.text = it.toString()
+        })
     }
 
     override fun initListener() {
-
-    }
-
-    private fun getData() {
-        val thread = Thread(Runnable {
-            try {
-                disasterDocument = Jsoup.connect(disasterSmsUrl)
-                    .header("Content-Type", "application/json")
-                    .requestBody(firstGetData().toString())
-                    .ignoreContentType(true)
-                    .post()
-
-                val covidData = Gson().fromJson(disasterDocument.body().text(), CovidModel::class.java)
-                Log.d("disaster", Gson().toJson(covidData))
-            } catch (e: IOException) {
-                e.printStackTrace()
-            }
-        })
-        thread.start()
-    }
-
-    private fun firstGetData(): JSONObject {
-        val jsonObject = JSONObject()
-        val searchInfo = JSONObject()
-        val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        val today = Calendar.getInstance()
-        val todayStr = simpleDateFormat.format(today.time)
-
-        searchInfo.put("pageIndex", "1")
-        searchInfo.put("pageUnit", "1")
-        searchInfo.put("searchBgnDe", todayStr)
-        searchInfo.put("searchEndDe", todayStr)
-        searchInfo.put("dstr_se_Id", "27")
-        searchInfo.put("c_ocrc_type", "DST200")
-        jsonObject.put("searchInfo", searchInfo)
-
-        return jsonObject
+        btn_refresh.setOnSingleClickListener {
+            viewModel.getTotalCount()
+        }
     }
 }
