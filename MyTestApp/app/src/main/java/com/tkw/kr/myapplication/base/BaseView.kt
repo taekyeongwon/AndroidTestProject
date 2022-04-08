@@ -1,6 +1,7 @@
 package com.tkw.kr.myapplication.base
 
 import android.content.Context
+import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
@@ -61,5 +62,10 @@ abstract class BaseView<T: BaseViewModel>: AppCompatActivity() {
                 MyProgressDialog.hide()
             }
         })
+    }
+
+    fun <U> startActivity(activity: Class<U>) {
+        val intent = Intent(this, activity)
+        startActivity(intent)
     }
 }

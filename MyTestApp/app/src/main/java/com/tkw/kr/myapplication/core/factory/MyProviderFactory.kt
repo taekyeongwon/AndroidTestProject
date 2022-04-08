@@ -10,6 +10,7 @@ import com.tkw.kr.myapplication.component.github.GithubViewModel
 import com.tkw.kr.myapplication.component.main.MainModelImpl
 import com.tkw.kr.myapplication.component.main.MainViewModel
 import com.tkw.kr.myapplication.component.map.MapViewModel
+import com.tkw.kr.myapplication.component.storage.StorageViewModel
 
 class MyProviderFactory: ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
@@ -18,6 +19,7 @@ class MyProviderFactory: ViewModelProvider.Factory {
             GithubViewModel::class.java -> GithubViewModel(GithubModelImpl()) as T
             MapViewModel::class.java -> MapViewModel() as T
             CovidViewModel::class.java -> CovidViewModel(CovidModelImpl()) as T
+            StorageViewModel::class.java -> StorageViewModel() as T
             else -> throw IllegalArgumentException("Unknown Class")
         }
     }

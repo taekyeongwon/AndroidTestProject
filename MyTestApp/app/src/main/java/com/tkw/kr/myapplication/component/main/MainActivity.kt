@@ -11,6 +11,7 @@ import com.tkw.kr.myapplication.base.BaseView
 import com.tkw.kr.myapplication.component.covid.CovidActivity
 import com.tkw.kr.myapplication.component.github.GithubActivity
 import com.tkw.kr.myapplication.component.map.GoogleMapActivity
+import com.tkw.kr.myapplication.component.storage.StorageActivity
 import com.tkw.kr.myapplication.core.factory.MyProviderFactory
 import com.tkw.kr.myapplication.util.setOnSingleClickListener
 import kotlinx.android.synthetic.main.activity_main.*
@@ -32,18 +33,18 @@ class MainActivity : BaseView<MainViewModel>() {
 
     override fun initListener() {
         btn_github.setOnSingleClickListener {
-            val githubIntent = Intent(this@MainActivity, GithubActivity::class.java)
-            startActivity(githubIntent)
+            startActivity(GithubActivity::class.java)
         }
 
         btn_googlemap.setOnSingleClickListener {
-            val googlemapIntent = Intent(this@MainActivity, GoogleMapActivity::class.java)
-            startActivity(googlemapIntent)
+            startActivity(GoogleMapActivity::class.java)
         }
 
         btn_covid.setOnSingleClickListener {
-            val covidIntent = Intent(this@MainActivity, CovidActivity::class.java)
-            startActivity(covidIntent)
+            startActivity(CovidActivity::class.java)
+        }
+        btn_storage.setOnSingleClickListener {
+            startActivity(StorageActivity::class.java)
         }
     }
 
