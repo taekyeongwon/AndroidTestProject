@@ -8,6 +8,8 @@ import android.util.Log
 import androidx.lifecycle.ViewModelProvider
 import com.tkw.kr.myapplication.R
 import com.tkw.kr.myapplication.base.BaseView
+import com.tkw.kr.myapplication.component.broad.BroadcastActivity
+import com.tkw.kr.myapplication.component.broad.TestActivity
 import com.tkw.kr.myapplication.component.covid.CovidActivity
 import com.tkw.kr.myapplication.component.github.GithubActivity
 import com.tkw.kr.myapplication.component.map.GoogleMapActivity
@@ -42,6 +44,9 @@ class MainActivity : BaseView<MainViewModel>() {
 
         btn_covid.setOnSingleClickListener {
             startActivity(CovidActivity::class.java)
+        }
+        btn_broad.setOnSingleClickListener {
+            startActivity(TestActivity::class.java)
         }
         btn_storage.setOnSingleClickListener {
             startActivity(StorageActivity::class.java)
