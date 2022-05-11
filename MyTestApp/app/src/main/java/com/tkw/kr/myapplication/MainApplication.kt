@@ -43,7 +43,7 @@ class MainApplication: MultiDexApplication() {
         }
     }
 
-    private fun getStackTrace(e: Throwable): String {
+    fun getStackTrace(e: Throwable?): String {
         val result = StringWriter()
         val printWriter = PrintWriter(result)
 

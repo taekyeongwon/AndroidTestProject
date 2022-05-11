@@ -1,6 +1,7 @@
 package com.tkw.kr.myapplication.core.network.error
 
 import android.content.Context
+import com.tkw.kr.myapplication.MainApplication
 import com.tkw.kr.myapplication.R
 import com.tkw.kr.myapplication.core.network.base.ServerResult
 import java.lang.Exception
@@ -32,6 +33,10 @@ object AppError {
         open fun getTokenErrorCode(): Int {
             return -1
         }
+
+        open fun getStackTraceString(): String {
+            return "서버 통신 실패"
+        }
     }
 
     /**
@@ -57,6 +62,10 @@ object AppError {
         override fun getTokenErrorCode(): Int {
             return httpCode
         }
+
+        override fun getStackTraceString(): String {
+            return MainApplication.application?.getStackTrace(cause) ?: "서버 통신 실패"
+        }
     }
 
     class Server(val response: ServerResult, cause: Throwable? = null): Base("", cause) {
@@ -73,6 +82,10 @@ object AppError {
 
         override fun getResultCode(): String {
             return response.resultCode()
+        }
+
+        override fun getStackTraceString(): String {
+            return MainApplication.application?.getStackTrace(cause) ?: "서버 통신 실패"
         }
     }
 }

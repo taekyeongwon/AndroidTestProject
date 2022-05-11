@@ -27,17 +27,17 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".component.map.GoogleMapActivity"
-            android:exported="false"/>
+        <activity android:name=".component.map.GoogleMapActivity"/>
 
-        <activity android:name=".component.github.GithubActivity"
-            android:exported="false"/>
+        <activity android:name=".component.github.GithubActivity"/>
 
-        <activity android:name=".component.covid.CovidActivity"
-            android:exported="false"/>
+        <activity android:name=".component.covid.CovidActivity"/>
 
-        <activity android:name=".component.storage.StorageActivity"
-            android:exported="false"/>
+        <activity android:name=".component.broad.BroadcastActivity"/>
+
+        <activity android:name=".component.storage.StorageActivity"/>
+
+        <activity android:name=".component.broad.TestActivity"/>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

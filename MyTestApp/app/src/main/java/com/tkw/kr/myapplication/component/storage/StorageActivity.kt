@@ -1,8 +1,12 @@
 package com.tkw.kr.myapplication.component.storage
 
 import android.content.pm.PackageManager
+import android.database.Cursor
+import android.net.Uri
 import android.os.Build
 import android.os.Environment
+import android.provider.MediaStore
+import android.util.Log
 import androidx.lifecycle.ViewModelProvider
 import com.tkw.kr.myapplication.R
 import com.tkw.kr.myapplication.base.BaseView
@@ -12,7 +16,6 @@ import kotlinx.android.synthetic.main.activity_storage.*
 import java.io.BufferedWriter
 import java.io.File
 import java.io.FileWriter
-import java.security.Permissions
 
 /**
  * built-in 외부저장소가 존재하며, SD카드를 지원하는 디바이스라면 다음과 같이 됩니다.
@@ -64,11 +67,14 @@ class StorageActivity: BaseView<StorageViewModel>() {
         writeFileToStorage(savedPathString)
     }
 
-    //외부 저장소(scoped storage) 개별 공간
+    // 공유 공간 : /mnt/sdcard /storage/emulated/0 /storage/self/primary
+
+    //외부 저장소(legacy, scoped storage) 개별 공간
     //외부 저장소에서 getExternalFilesDir() 또는 getExternalCacheDir()
     // todo 개별 공간 : 위 공유공간 경로/Android/data/com.xxx.xxx/files -> 권한만 있으면 다른 앱에서 접근 시 접근 가능? 레거시냐 스코프냐에 따라 다른가?
     // 개별공간 경로는 getExternalFilesDir(null)로 scoped랑 동일한지? ㅇㅇ
     // getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) 형태로 가져온 경로가 공유공간? ㄴㄴ 개별공간 안의 해당 앱만 접근 가능한 미디어 공간인것(절대 경로를 얻기 위해 MediaStore로 저장한 파일을 옮겨와서 절대경로를 얻을 수 있다. ex 서버 업로드 시)
+    // -> 위 공유공간 경로/Android/data/com.xxx.xxx/files/Download 아래에 생김
     // 같은 앱 내에서 권한없이 접근 가능, 다른 앱에 접근할 때만 권한 필요
     // todo 개별 공간 샌드박스 처리 되어 외부 앱에서 접근 불가능 -> 레거시냐 스코프냐에 따라 다른가?
     // 앱 삭제 시 관련 파일 같이 삭제됨
@@ -84,11 +90,12 @@ class StorageActivity: BaseView<StorageViewModel>() {
     }
 
     //외부 저장소(legacy storage) 공유 공간 - 접근하려면 저장소 권한 필요
-    // 공유 공간 : /mnt/sdcard /storage/emulated/0 /storage/self/primary
     // Environment.getExternalStorageDirectory() 형태로 가져온 경로가 공유공간? ㅇㅇ
     // 개별 공간 : 위 공유공간 경로/Android/data/com.xxx.xxx/files -> 권한만 있으면 다른 앱에서 접근 시 접근 가능
     // 개별공간 경로는 getExternalFilesDir(null)로 scoped랑 동일한지? ㅇㅇ
     // 앱 삭제 시 파일 삭제 안됨
+    // 안드로이드 11에서도 Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) 경로에 저장 시 저장 됨. - deprecated됐으나 아직 사용 가능한 상태
+    // Environment.getExternalStorageDirectory() 경로에 저장 시 crash 발생함. -> 권한 필요, 11부턴 권한 있어도 저장 불가(write권한 무시되기 때문)
     private fun externalLegacyStorageShared() {
         if(checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE), 0x01)
@@ -126,7 +133,8 @@ class StorageActivity: BaseView<StorageViewModel>() {
 
     //MediaStore API로 접근
     private fun sharedMediaArea() {
-
+        Log.d("test", MediaStore.Images.Media.EXTERNAL_CONTENT_URI.path ?: "null")
+        Log.d("test", getGalleryImageFullPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI)?.path ?: "null")
     }
 
     //SAF(Storage Access Framework)로 접근
@@ -143,5 +151,18 @@ class StorageActivity: BaseView<StorageViewModel>() {
         if(requestCode == 0x01 && grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             externalLegacyStorageShared()
         }
+    }
+
+    private fun getGalleryImageFullPath(uri: Uri): Uri? {
+        val filePathColumn: Array<String> = arrayOf(MediaStore.Images.Media.DATA)   //29부터 deprecate 되어 경로 가져올수 없음. file descriptor 사용하는 방법으로 가져오기
+        val cursor: Cursor? = contentResolver.query(uri, filePathColumn, null, null, null)
+        val columnIndex = cursor?.getColumnIndex(filePathColumn[0]) ?: 0
+        var picturePath: String? = ""
+        if(columnIndex != -1) {
+            picturePath = cursor?.getString(columnIndex)
+        }
+        cursor?.close()
+
+        return if(picturePath != null) Uri.fromFile(File(picturePath)) else null
     }
 }
