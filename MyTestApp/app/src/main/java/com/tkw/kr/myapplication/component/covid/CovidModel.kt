@@ -8,6 +8,8 @@ import org.json.JSONObject
 import org.jsoup.Jsoup
 import java.io.IOException
 import java.lang.NumberFormatException
+import java.text.DecimalFormat
+import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.regex.Pattern
@@ -95,11 +97,19 @@ class CovidModelImpl: CovidModel {
         val searchInfo = JSONObject()
         val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val today = Calendar.getInstance()
+        val isYesterday = today.get(Calendar.HOUR_OF_DAY) < 9   //현재 시간이 22.02.08 09시 이전이면 조회해올 날짜는 22.02.07 ~ 22.02.08
+        val yesterdayStr = if(isYesterday) {
+            val yesterday = Calendar.getInstance()
+            yesterday.add(Calendar.DAY_OF_MONTH, -1)
+            simpleDateFormat.format(yesterday.time)
+        } else {
+            simpleDateFormat.format(today.time)
+        }
         val todayStr = simpleDateFormat.format(today.time)
 
         searchInfo.put("pageIndex", "1")
         searchInfo.put("pageUnit", count.toString())
-        searchInfo.put("searchBgnDe", todayStr)
+        searchInfo.put("searchBgnDe", yesterdayStr)
         searchInfo.put("searchEndDe", todayStr)
         searchInfo.put("dstr_se_Id", "27")
         searchInfo.put("c_ocrc_type", "DST200")
@@ -123,17 +133,33 @@ class CovidModelImpl: CovidModel {
                 lastIndex = covidDTO.disasterSmsList[0].MD101_SN
             }
             val pattern = Pattern.compile("[0-9]+명")
+//            val patternDefinite = Pattern.compile("[0-9]{1,3}(,[0-9]{3})*명(\\s*[발생|확진])?")
+            val patternDefinite = Pattern.compile("(확진자)?\\s*[0-9]{1,3}(,[0-9]{3})*명(\\s*[발생|확진])?")
             val matcher = pattern.matcher(covidDTO.disasterSmsList[i].MSG_CN)
-            if (matcher.find()) {
+            val matcherDefinite = patternDefinite.matcher(covidDTO.disasterSmsList[i].MSG_CN)
+            if (matcherDefinite.find() && matcher.find(matcherDefinite.start())) {
+
                 try {
-                    covidDTO.disasterSmsList[i].confirmed_count +=
-                        covidDTO.disasterSmsList[i].MSG_CN.substring(matcher.start() until matcher.end() - 1)
-                            .toInt()
+                    val decimalFormat = DecimalFormat("#,###")  //그냥 replace해서 쓰자..
+                    val substringNumber = decimalFormat.parse(covidDTO.disasterSmsList[i].MSG_CN
+                        .substring(matcherDefinite.start() until matcher.end() - 1))
+
+                    if(substringNumber is Int) {
+                        covidDTO.disasterSmsList[i].confirmed_count += substringNumber.toInt()
+                        Log.d("CovidModel", "definite match : " + covidDTO.disasterSmsList[i].MSG_CN + "명수 : ${substringNumber.toInt()}명")
+                    }
+//                    covidDTO.disasterSmsList[i].confirmed_count += substringNumber.toInt()
 
                     smsList.add(covidDTO.disasterSmsList[i])
                 } catch (e: NumberFormatException) {
                     e.printStackTrace()
+                } catch (e: ParseException) {
+                    e.printStackTrace()
+                } catch (e: Exception) {
+                    e.printStackTrace()
                 }
+            } else {
+//                Log.d("CovidModel", "not definite match : " + covidDTO.disasterSmsList[i].MSG_CN)
             }
         }
         return smsList
