@@ -8,6 +8,8 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="28"/>
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-feature android:name="android.hardware.camera2" android:required="true" />
 
     <application
         android:allowBackup="true"
@@ -50,6 +52,16 @@
         <meta-data
             android:name="com.kakao.sdk.AppKey"
             android:value="${KAKAO_MAPS_APP_KEY}"/>
+        
+        <provider
+            android:authorities="com.tkw.kr.myapplication"
+            android:name="androidx.core.content.FileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_path"/>
+        </provider>
     </application>
 
 </manifest>
